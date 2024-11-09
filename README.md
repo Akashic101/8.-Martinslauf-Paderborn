@@ -42,7 +42,7 @@ node resultParser.js
 
 This will execute the script (`resultParser.js`), which performs the following steps:
 
-1. **Fetch Data**: It makes HTTP requests to the official results page, retrieving paginated results for the 10km-run category.
+1. **Fetch Data**: It makes HTTP requests to the official results page, retrieving paginated results for the 10km-run category of 2023 and 2024.
 2. **Parse and Insert Data**: The script parses the fetched data and inserts it into a SQLite database (`results.db`).
 3. **Handle Pagination**: The script automatically handles pagination, fetching data in batches of 125 records per request, until all results are retrieved.
 
@@ -59,14 +59,14 @@ sqlite3 results.db
 Inside the SQLite shell, you can run SQL queries like:
 
 ```sql
-SELECT * FROM results LIMIT 10;
+SELECT * FROM results_2024 LIMIT 10;
 ```
 
-This will display the first 10 entries from the results table.
+This will display the first 10 entries from the results table of 2024.
 
 ### Data Source
 
-The data is sourced directly from the official results page of the 8. Martinslauf in Paderborn, specifically for the **10km-run** category. The script makes POST requests to the Davengo results API, which returns the results in JSON format. This data includes information such as:
+The data is sourced directly from the official results page of the 7. and 8. Martinslauf in Paderborn, specifically for the **10km-run** category. The script makes POST requests to the Davengo results API, which returns the results in JSON format. This data includes information such as:
 
 - **Team Name**
 - **First Name**
@@ -85,7 +85,7 @@ The main script is `resultParser.js`, which:
 
 - **Makes POST requests** to the Davengo API with parameters like `category` (10km-run), `offset` (for pagination), and `term` (for search filtering).
 - **Parses the returned JSON** data to extract relevant fields.
-- **Inserts the parsed data into a SQLite database** (`results.db`), creating a table (`results`) if it doesn't already exist.
+- **Inserts the parsed data into a SQLite database** (`results.db`), creating a if it doesn't already exist.
 
 ## How to Set Up the Python Environment
 

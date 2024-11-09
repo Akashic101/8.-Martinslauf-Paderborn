@@ -13,7 +13,7 @@ SELECT
     COUNT(CASE WHEN rankMale IS NOT NULL THEN 1 END) AS maleCount,
     COUNT(CASE WHEN rankFemale IS NOT NULL THEN 1 END) AS femaleCount
 FROM 
-    results
+    results_2024
 WHERE 
     teamName != ''
 GROUP BY 

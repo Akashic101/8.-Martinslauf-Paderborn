@@ -1,10 +1,10 @@
 const axios = require("axios");
 const Database = require("better-sqlite3");
 
-// Step 1: Initialize SQLite database
 const db = new Database("results.db");
+
 db.exec(`
-  CREATE TABLE IF NOT EXISTS results (
+  CREATE TABLE IF NOT EXISTS results_2024 (
     teamName TEXT,
     firstName TEXT,
     lastName TEXT,
@@ -20,9 +20,25 @@ db.exec(`
   );
 `);
 
-// Step 2: Prepare an insert statement
-const insert = db.prepare(`
-  INSERT INTO results (
+db.exec(`
+  CREATE TABLE IF NOT EXISTS results_2023 (
+    teamName TEXT,
+    firstName TEXT,
+    lastName TEXT,
+    ageGroupShort TEXT,
+    nettoTime TEXT,
+    rankMale TEXT,
+    startNo INTEGER,
+    combined TEXT,
+    rankTotal TEXT,
+    rankFemale TEXT,
+    hash TEXT,
+    rankAgeGroup TEXT
+  );
+`);
+
+const insert2024 = db.prepare(`
+  INSERT INTO results_2024 (
     teamName, firstName, lastName, ageGroupShort, nettoTime, 
     rankMale, startNo, combined, rankTotal, rankFemale, 
     hash, rankAgeGroup
@@ -33,10 +49,19 @@ const insert = db.prepare(`
   );
 `);
 
-// Step 3: Prepare to handle requests and insert data into the database
-const fetchData = async (offset = 0) => {
-  const url =
-    "https://www.davengo.com/event/result/8-paderborner-martinslauf-2024/search/list";
+const insert2023 = db.prepare(`
+  INSERT INTO results_2023 (
+    teamName, firstName, lastName, ageGroupShort, nettoTime, 
+    rankMale, startNo, combined, rankTotal, rankFemale, 
+    hash, rankAgeGroup
+  ) VALUES (
+    @teamName, @firstName, @lastName, @ageGroupShort, @nettoTime, 
+    @rankMale, @startNo, @combined, @rankTotal, @rankFemale, 
+    @hash, @rankAgeGroup
+  );
+`);
+
+const fetchData = async (url, insertStatement, offset = 0) => {
   const headers = {
     "User-Agent":
       "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:132.0) Gecko/20100101 Firefox/132.0",
@@ -44,8 +69,7 @@ const fetchData = async (offset = 0) => {
     "Accept-Language": "de,en-US;q=0.7,en;q=0.3",
     "Content-Type": "application/json;charset=utf-8",
     Origin: "https://www.davengo.com",
-    Referer:
-      "https://www.davengo.com/event/result/8-paderborner-martinslauf-2024/search?category=10km%20Autohaus%20Krenz%20Lauf",
+    Referer: url,
     DNT: "1",
     "Sec-GPC": "1",
     Connection: "keep-alive",
@@ -62,30 +86,36 @@ const fetchData = async (offset = 0) => {
     const response = await axios.post(url, data, { headers });
     const { results, navigation } = response.data;
 
-    // Step 4: Insert the results into the SQLite database
     const insertMany = db.transaction((data) => {
       for (const row of data) {
-        insert.run(row);
+        insertStatement.run(row);
       }
     });
     insertMany(results);
 
     console.log(
-      `Inserted ${results.length} results. Moving to the next page...`
+      `Inserted ${results.length} results for ${url}. Moving to the next page...`
     );
 
-    // Check if there's a nextOffset to continue fetching more data
     if (navigation && navigation.nextOffset) {
-      await fetchData(navigation.nextOffset);
+      await fetchData(url, insertStatement, navigation.nextOffset);
     } else {
-      console.log(
-        "All data has been successfully inserted into the SQLite database."
-      );
+      console.log(`All data for ${url} has been successfully inserted.`);
     }
   } catch (error) {
-    console.error("Error fetching data:", error);
+    console.error(`Error fetching data from ${url}:`, error);
   }
 };
 
-// Step 5: Start the data fetching process
-fetchData();
+(async () => {
+  const url2024 =
+    "https://www.davengo.com/event/result/8-paderborner-martinslauf-2024/search/list";
+  const url2023 =
+    "https://www.davengo.com/event/result/7-paderborner-martinslauf-2023/search/list";
+
+  console.log("Fetching results for 2024...");
+  await fetchData(url2024, insert2024);
+
+  console.log("Fetching results for 2023...");
+  await fetchData(url2023, insert2023);
+})();

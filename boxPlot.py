@@ -7,7 +7,7 @@ conn = sqlite3.connect('results.db')
 cursor = conn.cursor()
 
 cursor.execute('''
-SELECT nettoTime, rankTotal, ageGroupShort FROM results
+SELECT nettoTime, rankTotal, ageGroupShort FROM results_2024
 ''')
 
 data = cursor.fetchall()
