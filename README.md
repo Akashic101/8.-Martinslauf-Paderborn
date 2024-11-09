@@ -20,8 +20,8 @@ Before running the script, ensure that you have the following software installed
 Start by cloning the repository to your local machine:
 
 ```bash
-git clone https://github.com/akashic101/8-martinslauf-paderborn.git
-cd 8-martinslauf-paderborn
+git clone https://github.com/Akashic101/8.-Martinslauf-Paderborn
+cd 8.-Martinslauf-Paderborn
 ```
 
 ### Step 2: Install Dependencies
