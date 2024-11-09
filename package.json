@@ -1,0 +1,14 @@
+{
+  "name": "martinslauf_results",
+  "version": "1.0.0",
+  "description": "",
+  "main": "resultParser.js",
+  "dependencies": {
+    "better-sqlite3": "^11.5.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
